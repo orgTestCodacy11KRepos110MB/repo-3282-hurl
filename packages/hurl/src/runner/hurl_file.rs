@@ -16,6 +16,7 @@
  *
  */
 use std::collections::HashMap;
+use std::io::{stderr, Write};
 use std::thread;
 use std::time::Instant;
 
@@ -104,6 +105,8 @@ pub fn run(
     let start = Instant::now();
 
     loop {
+        eprint!("\r{}", ".".repeat(entry_index));
+
         if entry_index > n {
             break;
         }
@@ -222,6 +225,12 @@ pub fn run(
         entry_index += 1;
         retry_count = 1;
     }
+
+    // This is the "EL - Erase in Line" sequence. It clears from the cursor
+    // to the end of line.
+    // https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
+    let _ = stderr().write_all(b"\r\x1B[K");
+
 
     let time_in_ms = start.elapsed().as_millis();
     let cookies = http_client.get_cookie_storage();
